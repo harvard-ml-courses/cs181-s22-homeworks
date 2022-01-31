@@ -44,20 +44,22 @@ def predict_knn(k, tau=1):
     for x in x_test:
         lst = []
         for i, (x_n, y_n) in enumerate(data):
-            distance = - (x_n - x) ** 2
+            distance = - ((x_n - x) ** 2)
             kernel = pow(np.e, distance)
             lst.append((i, kernel))
         k_dist.append(lst)
     
     for lst in k_dist:
         lst.sort(key=takeSecond, reverse=True)
-    print(k_dist)
+
     for n, lst in enumerate(k_dist):
         kernel_reg = 0
         for i, (j, dist) in enumerate(lst):
-            if i <= k:
+            if i < k:
                 x, y = data[j]
                 kernel_reg += y
+                print(f"{n}:")
+                print(kernel_reg)
             else:
                 y_test[n] = (1/k) * kernel_reg
     print(y_test)
