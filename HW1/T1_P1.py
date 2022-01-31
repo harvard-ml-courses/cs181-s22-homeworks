@@ -34,7 +34,6 @@ def plot():
     plot_data = { "0.01" : [], "2" : [], "100" : [] }
     
     for tau in (0.01, 2, 100):
-        kernel_reg = 0
         for x in np.arange(0., 12.1, 0.1):
             kernel_reg = 0
             for (x_n, y_n) in data:

@@ -30,10 +30,38 @@ x_test = np.arange(0, 12, .1)
 print("y is:")
 print(y_train)
 
-def predict_knn(k=1, tau=1):
-    """Returns predictions for the values in x_test, using KNN predictor with the specified k."""
-    # TODO: your code here
-    return np.zeros(len(x_test))
+def takeSecond(elem):
+    _, kernel_reg = elem
+    return kernel_reg
+
+def predict_knn(k, tau=1):
+    """Returns predictions for the values in x_test, using KNN predictor with the specified k.""" 
+    y_test = np.zeros(len(x_test))
+    
+    # List of lists: will store the distances between every x_test point and x_0 to x_6
+    k_dist = []
+
+    for x in x_test:
+        lst = []
+        for i, (x_n, y_n) in enumerate(data):
+            distance = - (x_n - x) ** 2
+            kernel = pow(np.e, distance)
+            lst.append((i, kernel))
+        k_dist.append(lst)
+    
+    for lst in k_dist:
+        lst.sort(key=takeSecond, reverse=True)
+    print(k_dist)
+    for n, lst in enumerate(k_dist):
+        kernel_reg = 0
+        for i, (j, dist) in enumerate(lst):
+            if i <= k:
+                x, y = data[j]
+                kernel_reg += y
+            else:
+                y_test[n] = (1/k) * kernel_reg
+    print(y_test)
+    return y_test
 
 
 def plot_knn_preds(k):
