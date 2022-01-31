@@ -34,7 +34,7 @@ def takeSecond(elem):
     _, kernel_reg = elem
     return kernel_reg
 
-def predict_knn(k, tau=1):
+def predict_knn(k, tau):
     """Returns predictions for the values in x_test, using KNN predictor with the specified k.""" 
     y_test = np.zeros(len(x_test))
     
@@ -53,16 +53,17 @@ def predict_knn(k, tau=1):
         lst.sort(key=takeSecond, reverse=True)
 
     for n, lst in enumerate(k_dist):
-        kernel_reg = 0
+        kernel_reg = 0.
         for i, (j, dist) in enumerate(lst):
             if i < k:
                 x, y = data[j]
-                kernel_reg += y
-                print(f"{n}:")
-                print(kernel_reg)
+                kernel_reg += y / k
+                # print(f"{n}:")
+                # print(kernel_reg)
             else:
-                y_test[n] = (1/k) * kernel_reg
-    print(y_test)
+                y_test[n] = kernel_reg
+                # print(f"{n}:")
+                # print(y_test[n])
     return y_test
 
 
@@ -70,7 +71,7 @@ def plot_knn_preds(k):
     plt.xlim([0, 12])
     plt.ylim([0,3])
     
-    y_test = predict_knn(k=k)
+    y_test = predict_knn(k=k, tau=1)
     
     plt.scatter(x_train, y_train, label = "training data", color = 'black')
     plt.plot(x_test, y_test, label = "predictions using k = " + str(k))
