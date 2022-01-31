@@ -34,7 +34,7 @@ def takeSecond(elem):
     _, kernel_reg = elem
     return kernel_reg
 
-def predict_knn(k, tau):
+def predict_knn(k, tau=1):
     """Returns predictions for the values in x_test, using KNN predictor with the specified k.""" 
     y_test = np.zeros(len(x_test))
     
@@ -71,7 +71,7 @@ def plot_knn_preds(k):
     plt.xlim([0, 12])
     plt.ylim([0,3])
     
-    y_test = predict_knn(k=k, tau=1)
+    y_test = predict_knn(k=k)
     
     plt.scatter(x_train, y_train, label = "training data", color = 'black')
     plt.plot(x_test, y_test, label = "predictions using k = " + str(k))

@@ -32,18 +32,19 @@ def compute_loss(tau):
 
 def plot():
     plot_data = { "0.01" : [], "2" : [], "100" : [] }
-    
+    x_test = np.arange(0., 12., 0.1)
+
     for tau in (0.01, 2, 100):
-        for x in np.arange(0., 12.1, 0.1):
+        for x in x_test:
             kernel_reg = 0
             for (x_n, y_n) in data:
                 distance = - (x_n - x) ** 2
                 kernel_reg += pow(np.e, distance / tau) * y_n
             plot_data[str(tau)].append(kernel_reg)
 
-    line1, = plt.plot(np.arange(0., 12.1, 0.1), plot_data["0.01"], label="0.01")
-    line2, = plt.plot(np.arange(0., 12.1, 0.1), plot_data["2"], label="2")
-    line3, = plt.plot(np.arange(0., 12.1, 0.1), plot_data["100"], label="100")
+    line1, = plt.plot(x_test, plot_data["0.01"], label="0.01")
+    line2, = plt.plot(x_test, plot_data["2"], label="2")
+    line3, = plt.plot(x_test, plot_data["100"], label="100")
     leg = plt.legend(loc="upper right")
     plt.xlabel("x^*")
     plt.ylabel("f(x^*)")
