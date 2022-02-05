@@ -36,19 +36,19 @@ sunspot_counts = np.array(sunspot_counts)
 last_year = 1985
 
 # Plot the data.
-plt.figure(1)
-plt.plot(years, republican_counts, 'o')
-plt.xlabel("Year")
-plt.ylabel("Number of Republicans in Congress")
-plt.figure(2)
-plt.plot(years, sunspot_counts, 'o')
-plt.xlabel("Year")
-plt.ylabel("Number of Sunspots")
-plt.figure(3)
-plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
-plt.xlabel("Number of Sunspots")
-plt.ylabel("Number of Republicans in Congress")
-plt.show()
+# plt.figure(1)
+# plt.plot(years, republican_counts, 'o')
+# plt.xlabel("Year")
+# plt.ylabel("Number of Republicans in Congress")
+# plt.figure(2)
+# plt.plot(years, sunspot_counts, 'o')
+# plt.xlabel("Year")
+# plt.ylabel("Number of Sunspots")
+# plt.figure(3)
+# plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
+# plt.xlabel("Number of Sunspots")
+# plt.ylabel("Number of Republicans in Congress")
+# plt.show()
 
 # Create the simplest basis, with just the time and an offset.
 X = np.vstack((np.ones(years.shape), years)).T
@@ -70,6 +70,7 @@ def make_basis(xx,part,is_years=True):
 
     return_arr = []
     
+    # Problem 4.1
     if part == 'a' and is_years:
         for year in xx:
             year_vec = np.array([1, year, year ** 2, year ** 3, year ** 4, year ** 5])
@@ -98,7 +99,32 @@ def make_basis(xx,part,is_years=True):
                 year_lst.append(np.cos(year/j))
             year_vec = np.array(year_lst)
             return_arr.append(year_vec)
-    print(np.vstack(return_arr))
+
+    # Problem 4.2
+    if part == 'a' and not is_years:
+        for i, count in enumerate(xx):
+            if i < 13: # years before 1985
+                count_vec = np.array([1, count, count ** 2, count ** 3, count ** 4, year ** 5])
+                return_arr.append(count_vec)
+    
+    if part == 'c' and not is_years:
+        for i, count in enumerate(xx):
+            if i < 13: # years before 1985
+                count_lst = [1]
+                for j in np.arange(1., 6., 1.):
+                    count_lst.append(np.cos(count/j))
+                count_vec = np.array(count_lst)
+                return_arr.append(count_vec)
+    
+    if part == 'd' and not is_years:
+        for i, count in enumerate(xx):
+            if i < 13: # years before 1985
+                count_lst = [1]
+                for j in np.arange(1., 26., 1.):
+                    count_lst.append(np.cos(count/j))
+                count_vec = np.array(count_lst)
+                return_arr.append(count_vec)
+
     return np.vstack(return_arr)
 
 # Nothing fancy for outputs.
@@ -107,23 +133,31 @@ Y = republican_counts
 # Find the regression weights using the Moore-Penrose pseudoinverse.
 def find_weights(X,Y):
     w = np.dot(np.linalg.pinv(np.dot(X.T, X)), np.dot(X.T, Y))
-    print([-4.89044882e+04,  6.10124740e+03, -2.89779054e+02,  6.81008355e+00,
-       -7.91744489e-02,  3.64369239e-04])
-    print(w)
     return w
 
 # Compute the regression line on a grid of inputs.
 # DO NOT CHANGE grid_years!!!!!
 grid_years = np.linspace(1960, 2005, 200)
 
-for part in ["a"]:
+squared_errors = []
+
+for part in ["a", "b", "c", "d"]:
     grid_X = make_basis(grid_years, part)
     grid_Yhat  = np.dot(grid_X, find_weights(make_basis(years, part), Y))
 
     # TODO: plot and report sum of squared error for each basis
+    sum_errors = 0
+    # Yhat = np.dot(grid_X, find_weights(X, Y))
+
+    # for i, count in enumerate(Y):
+    #     sum_errors += (count - Yhat[i]) ** 2
+    # squared_errors.append(sum_errors)
 
     # Plot the data and the regression line.
     plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
     plt.xlabel("Year")
     plt.ylabel("Number of Republicans in Congress")
     plt.show()
+
+for error in squared_errors:
+    print(f"Loss " + error)

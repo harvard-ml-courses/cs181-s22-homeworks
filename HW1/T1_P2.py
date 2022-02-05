@@ -59,12 +59,8 @@ def predict_knn(k):
             if i < k:
                 x, y = data[j]
                 kernel_reg += y / k
-                # print(f"{n}:")
-                # print(kernel_reg)
             else:
                 y_test[n] = kernel_reg
-                # print(f"{n}:")
-                # print(y_test[n])
     print(y_test)
     return y_test
 
