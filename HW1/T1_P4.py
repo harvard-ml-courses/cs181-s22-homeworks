@@ -60,16 +60,46 @@ X = np.vstack((np.ones(years.shape), years)).T
 # is_years is a Boolean variable which indicates whether or not the input variable is
 # years; if so, is_years should be True, and if the input varible is sunspots, is_years
 # should be false
-def make_basis(xx,part='a',is_years=True):
-#DO NOT CHANGE LINES 65-69
+def make_basis(xx,part,is_years=True):
+#DO NOT CHANGE LINES 65-69: re-scaling the data
     if part == 'a' and is_years:
         xx = (xx - np.array([1960]*len(xx)))/40
         
     if part == "a" and not is_years:
         xx = xx/20
-        
-        
-    return None
+
+    return_arr = []
+    
+    if part == 'a' and is_years:
+        for year in xx:
+            year_vec = np.array([1, year, year ** 2, year ** 3, year ** 4, year ** 5])
+            return_arr.append(year_vec)
+
+    if part == 'b' and is_years:
+        for year in xx:
+            year_lst = [1]
+            for mu in np.arange(1960., 2011., 5.):
+                year_lst.append(pow(np.e, (- (year - mu) ** 2) / 25.))
+            year_vec = np.array(year_lst)
+            return_arr.append(year_vec)
+    
+    if part == 'c' and is_years:
+        for year in xx:
+            year_lst = [1]
+            for j in np.arange(1., 6., 1.):
+                year_lst.append(np.cos(year/j))
+            year_vec = np.array(year_lst)
+            return_arr.append(year_vec)
+
+    if part == 'd' and is_years:
+        for year in xx:
+            year_lst = [1]
+            for j in np.arange(1., 26., 1.):
+                year_lst.append(np.cos(year/j))
+            year_vec = np.array(year_lst)
+            return_arr.append(year_vec)
+    print(np.vstack(return_arr))
+    return np.vstack(return_arr)
 
 # Nothing fancy for outputs.
 Y = republican_counts
@@ -77,18 +107,23 @@ Y = republican_counts
 # Find the regression weights using the Moore-Penrose pseudoinverse.
 def find_weights(X,Y):
     w = np.dot(np.linalg.pinv(np.dot(X.T, X)), np.dot(X.T, Y))
+    print([-4.89044882e+04,  6.10124740e+03, -2.89779054e+02,  6.81008355e+00,
+       -7.91744489e-02,  3.64369239e-04])
+    print(w)
     return w
 
 # Compute the regression line on a grid of inputs.
 # DO NOT CHANGE grid_years!!!!!
 grid_years = np.linspace(1960, 2005, 200)
-grid_X = np.vstack((np.ones(grid_years.shape), grid_years))
-grid_Yhat  = np.dot(grid_X.T, w)
 
-# TODO: plot and report sum of squared error for each basis
+for part in ["a"]:
+    grid_X = make_basis(grid_years, part)
+    grid_Yhat  = np.dot(grid_X, find_weights(make_basis(years, part), Y))
 
-# Plot the data and the regression line.
-plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
-plt.xlabel("Year")
-plt.ylabel("Number of Republicans in Congress")
-plt.show()
+    # TODO: plot and report sum of squared error for each basis
+
+    # Plot the data and the regression line.
+    plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
+    plt.xlabel("Year")
+    plt.ylabel("Number of Republicans in Congress")
+    plt.show()
