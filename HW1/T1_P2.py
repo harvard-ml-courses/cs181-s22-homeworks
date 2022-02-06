@@ -51,8 +51,7 @@ def predict_knn(k):
     
     for lst in k_dist:
         lst.sort(key=takeSecond, reverse=True)
-        # print(lst)
-    # print(k_dist)
+
     for n, lst in enumerate(k_dist):
         kernel_reg = 0.
         for i, (j, dist) in enumerate(lst):
