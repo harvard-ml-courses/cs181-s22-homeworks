@@ -60,7 +60,7 @@ X = np.vstack((np.ones(years.shape), years)).T
 # is_years is a Boolean variable which indicates whether or not the input variable is
 # years; if so, is_years should be True, and if the input varible is sunspots, is_years
 # should be false
-def make_basis(xx,part,is_years=True):
+def make_basis(xx, part, is_years):
 #DO NOT CHANGE LINES 65-69: re-scaling the data
     if part == 'a' and is_years:
         xx = (xx - np.array([1960]*len(xx)))/40
@@ -102,12 +102,12 @@ def make_basis(xx,part,is_years=True):
 
     # Problem 4.2
     if part == 'a' and not is_years:
-        for count in xx[years<last_year]:
-            count_vec = np.array([1, count, count ** 2, count ** 3, count ** 4, year ** 5])
+        for count in xx:
+            count_vec = np.array([1, count, count ** 2, count ** 3, count ** 4, count ** 5])
             return_arr.append(count_vec)
-    
+
     if part == 'c' and not is_years:
-        for count in xx[years<last_year]:
+        for count in xx:
             count_lst = [1]
             for j in np.arange(1., 6., 1.):
                 count_lst.append(np.cos(count/j))
@@ -115,7 +115,7 @@ def make_basis(xx,part,is_years=True):
             return_arr.append(count_vec)
     
     if part == 'd' and not is_years:
-        for count in xx[years<last_year]:
+        for count in xx:
             count_lst = [1]
             for j in np.arange(1., 26., 1.):
                 count_lst.append(np.cos(count/j))
@@ -141,12 +141,12 @@ grid_sunspots = np.linspace(0, 160, 200)
 squared_errors = []
 
 for part in ["a", "b", "c", "d"]:
-    grid_X = make_basis(grid_years, part)
-    grid_Yhat  = np.dot(grid_X, find_weights(make_basis(years, part), Y))
+    grid_X = make_basis(grid_years, part, True)
+    grid_Yhat  = np.dot(grid_X, find_weights(make_basis(years, part, True), Y))
 
     # TODO: plot and report sum of squared error for each basis
     sum_errors = 0
-    Yhat = np.dot(make_basis(years, part), find_weights(make_basis(years, part), Y))
+    Yhat = np.dot(make_basis(years, part, True), find_weights(make_basis(years, part, True), Y))
 
     for i, count in enumerate(Y):
         sum_errors += (count - Yhat[i]) ** 2
@@ -166,12 +166,12 @@ for error in squared_errors:
 squared_errors = []
 
 for part in ["a", "c", "d"]:
-    grid_X = make_basis(grid_sunspots, part)
-    grid_Yhat  = np.dot(grid_X, find_weights(make_basis(sunspot_counts[years<last_year], part), Y[years<last_year]))
+    grid_X = make_basis(grid_sunspots, part, False)
+    grid_Yhat  = np.dot(grid_X, find_weights(make_basis(sunspot_counts[years<last_year], part, False), Y[years<last_year]))
 
     # TODO: plot and report sum of squared error for each basis
     sum_errors = 0
-    Yhat = np.dot(make_basis(sunspot_counts[years<last_year], part), find_weights(make_basis(sunspot_counts[years<last_year], part), Y[years<last_year]))
+    Yhat = np.dot(make_basis(sunspot_counts[years<last_year], part, False), find_weights(make_basis(sunspot_counts[years<last_year], part, False), Y[years<last_year]))
 
     for i, count in enumerate(Y[years<last_year]):
         sum_errors += (count - Yhat[i]) ** 2

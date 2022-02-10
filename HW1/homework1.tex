@@ -176,6 +176,51 @@ in the command-line using \texttt{python T1\_P1\_TestCases.py}.
 
 \newpage
 
+\noindent\textbf{Solution 1.1:}\\
+To find the loss over the training data, we find the squared difference between the $y_n$'s in the training data and the predicted values $\hat{y}_n = f(x_n)$:
+\begin{align*}
+    \mcL(W) &= \sum_{n=1}^{N} (y_n - f(x_n))^2\\
+    \mcL(W) &= \sum_{n=1}^{N} (y_n - \sum_{i\ne n}^{N}K(x_i,x_n)y_i)^2\\
+    \mcL(W) &= \sum_{n=1}^{N} (y_n - \sum_{i\ne n}^{N}\exp\left(\frac{-(x_i-x_n)^T (x_i-x_n)}{\tau} \right) y_i)^2
+\end{align*}
+
+\bigskip
+\noindent\textbf{Solution 1.2:}\\
+The derivative of the loss function with respect to $\tau$ is found by differentiating $\mcL(W)$ found in 1.1.
+\begin{align*}
+    \frac{d\mcL(W)}{d\tau} &= -2 \sum_{n=1}^{N} (y_n - \sum_{i\ne n}^{N} \exp\left(\frac{-(x_i-x_n)^T (x_i-x_n)}{\tau} \right) y_i) (\sum_{i\ne n}^{N} \frac{(x_i-x_n)^T (x_i-x_n)}{\tau^2} \exp\left(\frac{-(x_i-x_n)^T (x_i-x_n)}{\tau} \right) y_i)
+\end{align*}
+
+\bigskip
+\noindent\textbf{Solution 1.3:}\\
+Computing the loss with respect to each kernel (with different values of $\tau$) yields that $\tau = 2$ produces the lowest residual sum of squares, i.e. the least loss. Therefore, we can say that $\tau = 2$ is the lengthscale that does best with the dataset provided.
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ $\tau$ & $\mcL(W)$ \\ 
+ \hline\hline
+ $0.01$ & $8.75$ \\
+ \hline
+ $2$ & $3.305016494565789$ \\ 
+ \hline
+ $100$ & $120.35919342230957$ \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+\bigskip
+\noindent\textbf{Solution 1.4:}\\
+\begin{center}
+    \includegraphics[scale=0.7]{1.4.png}
+\end{center}
+When $\tau = 0.01$, the model predicts the values of $y$ for points in training data almost perfectly, but offers practically no insight on what $y$ is at other values of $x$, defaulting to $y \approx 0$ at all other $x$ values. This occurs because, when $\tau$ is small, $K(x, x')$ tends towards $0$, unless $||x-x'||^2_2$ is close to $0$ (i.e. you have two very nearby points), in which case $K(x, x')$ tends towards $1$. Therefore, when predicting a point at an $x^*$ that is equal to an $x_i$ in the training data $K(x_i, x^*)$ tends towards $1$ and $K(x \ne x_i, x^*)$ tends towards $0$, so $f(x^*)$ tends towards $y_i$. Thus, when $\tau = 0.01$, the model greatly overfits the training data and is not generalizable, even though it had the second best loss metric.\\
+
+\noindent When $\tau = 2$, the model produces a smooth curve over a set of $y$ values that closely (albeit not perfectly) predict the points occurring in the testing data, giving this model a low loss and better generalizability. It also predicts $y$ values that are too large because we did not normalize for the weights given to the $y$ points used to predict $f(x^*)$ (see further explanation of this below when $\tau = 100$).\\
+
+\noindent When $\tau = 100$, the model produces an even simpler smooth curve over a set of $y$ values that predict the points occurring in the testing data less well than the previous models, i.e. underfitting the training data. It also predicts $y$ values that are too large. This occurs because $\tau$ is effectively acting as a regularization parameter, penalizing large weights that are given to $y$'s corresponding to $x$'s that are close to $x^*$, and giving more weight (in comparison to previous models) to $y$'s corresponding to $x$'s that are further away from this $x^*$. Furthermore, in this model we did not normalize for the weights given to the $y$ points used to predict $f(x^*)$, so when the weight given to $x$'s that are further away from $x^*$ do not decay to $0$, the model ends up overestimating $f(x^*)$. Given the curve produced by this model is less expressive, it also makes it worse at interpolating and extrapolating from the training data, so ends up having the highest loss.\\
+
+\newpage
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -222,6 +267,32 @@ As before, you will plot $x^*$ on the x-axis and the prediction $f(x^*)$ on the 
 
 \end{problem}
 
+\newpage
+
+\noindent\textbf{Solution 2.1:}\\
+\begin{center}
+    \includegraphics[scale=0.5]{k1.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.5]{k3.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.5]{k6.png}
+\end{center}
+\newpage
+
+\noindent\textbf{Solution 2.2:}\\
+When $k = 1$, the model predicts the values of $y$ for points in training data perfectly, but clearly is overfitting to these data. This makes sense conceptually, as this model is finding the nearest (measured by the kernel) $x_i$ in the training data to $x^*$ and taking the corresponding $y_i$ to be $f(x^*)$. For all $x_i$ where $i \ne 0, N$, this $y_i$ is given to be the predicted value for all $x$ inputs on the range $[\frac{x_{n} + x_{n-1}}{2}, \frac{x_{n} + x_{n+1}}{2})$. Hence, we get what looks what a piecewise function that perfectly fits the training data. This is certainly similar to the plot with $\tau = 0.01$ from Problem 1, in terms of overfitting the training data.\\
+
+\noindent When $k = 3$, the model predicts the values of $y$ for points in training data slightly less well, and is not overfitting to these data as much. This makes sense conceptually, as this model is finding the nearest (measured by the kernel) 3 $x_i$'s in the training data to $x^*$ and taking the average of the corresponding 3 $y_i$'s to be $f(x^*)$. This has a similar behaviour to the plot with $\tau = 2$ from Problem 1, in terms of producing a middle-ground between $k=1$ and $k=N-1$ - neither overtly overfitting nor underfitting to the training data.\\
+
+\noindent When $k = N-1$, the model produces what looks like a piecewise function with two pieces: for $x^*<4$, $f(x^*)$ is the average of the $y_i$'s corresponding to $x_0, ..., x_{N-1}$; for $x^*>4$, $f(x^*)$ is the average of the $y_i$'s corresponding to $x_1, ..., x_N$. This has a similar behaviour to the plot with $\tau = 100$ from Problem 1, in terms of producing a line that is less expressive than the other models', and so underfits the data.\\
+
+\noindent Given the behaviour of these plots is similar to the respective plots from Problem 1, it can be said that they interpolate similarly. However, they extrapolate quite differently. Since, kNN regressors produce what look like piecewise functions, for $x^*>x_N$, $f(x^*)=f(x_N)$, and the kNN regressors give no additional information when extrapolating outside of the domain of the data. By comparison, kernel-based regressors have some additional predictive power when extrapolating; since they generate smooth curves (when $\tau$ is sufficiently greater than $0.01$), for $x^*>x_N$, $f(x^*) \ne f(x_N)$. Given such differences between the geometry of the plots, kNN and kernel-based regressors will not produce the exact same classifier (i.e. $f(x^*)$) for a given $x^*$.
+
+\bigskip
+\noindent\textbf{Solution 2.3:}\\
+Given $\tau$ is a positive scalar, it simply re-scales the distances between $x^*$ and its nearest neighbors but has no effect on the ranking of $x^*$'s nearest neighbors. This means that if $x_1$ is nearer to $x^*$ than $x_2$ with $\tau$ equal to some $c$ (where $c \in \mathbb{R}^{+}$), $x_1$ is nearer to $x^*$ than $x_2$ for all possible values of $c$. Thus, varying $\tau$ would have no effect on the $y_n$'s which we average to get $f(x^*)$, so we do not bother varying $\tau$ for the kNN approach.
 
 \newpage 
 
@@ -273,6 +344,51 @@ $y$ are scalars, $w$ is also a scalar.
 \end{enumerate}
 
 \end{problem}
+
+\newpage
+
+\noindent\textbf{Solution 3.1:}\\
+In this problem, we are given that the linear model has the form $\hat{y} = wx$. Substituting this into the expected squared loss gives:
+\begin{align*}
+    E_{x,y}[ ( y - \hat{y} )^2] &= E_{x,y}[ ( y - wx )^2]   
+\end{align*}
+Expanding the brackets and applying linearity of expectation gives:
+\begin{align*}
+    E_{x,y}[ ( y - \hat{y} )^2] &= E_{x,y}[ y^2 - 2wxy + w^2 x^2]\\
+    &= E_{x,y}[ y^2 ] - 2wE_{x,y}[xy] + w^2 E_{x,y}[x^2]
+\end{align*}
+We can drop the $y$ subscript for expectations involving only $x$ and the $x$ subscript for expectations involving only $y$:
+\begin{align*}
+    E_{x,y}[ ( y - \hat{y} )^2] &= E_{y}[ y^2 ] - 2wE_{x,y}[xy] + w^2 E_{x}[x^2]
+\end{align*}
+To find the optimal $w$ that minimizes the expected square loss above, we take the derivative of this expression with respect to $w$, set equal to 0, and solve for $w$:
+\begin{align*}
+    \frac{d}{dw} [ E_{y}[ y^2 ] - 2wE_{x,y}[xy] + w^2 E_{x}[x^2] ] &= 0\\
+    \implies - 2E_{x,y}[xy] + 2w E_{x}[x^2] &= 0\\
+    \implies w = \frac{E_{x,y}[xy]}{E_{x}[x^2]}
+\end{align*}
+
+\bigskip
+\noindent\textbf{Solution 3.2:}\\
+Unbiased and consistent formulas that estimate these expectations can be found using the Law of Large Numbers which states that for large data sets a sample mean $\Bar{X}_n$ converges to the true mean pointwise, with probability 1, i.e. $P(\Bar{X}_n \rightarrow \mu) = 1$. Thus, given observed data $\{(x_n,y_n)\}_{n=1}^N$, assuming $N$ is sufficiently large:
+\begin{align*}
+    E_{x,y}[xy] &= \frac{1}{N} \sum_{n=1}^{N} x_n y_n \text{ with probability } 1\\
+    E_{x}[x^2] &= \frac{1}{N} \sum_{n=1}^{N} x_n^2 \text{ with probability } 1
+\end{align*}
+
+\bigskip
+\noindent\textbf{Solution 3.3:}\\
+Substituting in these moment terms from 3.2 into the expression for the optimal $w$ from 3.1 gives:
+\begin{align*}
+    w^* &= \frac{\frac{1}{N} \sum_{n=1}^{N} x_n y_n}{\frac{1}{N} \sum_{n=1}^{N} x_n^2}\\
+    &= \frac{\sum_{n=1}^{N} x_n y_n}{\sum_{n=1}^{N} x_n^2}
+\end{align*}
+
+\noindent This expression is the 1-dimensional version of the Moore-Penrose pseudo inverse seen in section 2.6 of the textbook, $(\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}$. $\mathbf{X}$ is a Nx1 vector containing all the $x_i$'s, so $(\mathbf{X}^\top \mathbf{X})^{-1}$ is the inverse/reciprocal of a scalar equal to $\frac{1}{\sum_{n=1}^{N} x_n^2}$. Likewise $\mathbf{y}$ is a Nx1 vector containing all the $y_i$'s, so $\mathbf{X}^\top \mathbf{y}$ is equal to the scalar $\sum_{n=1}^{N} x_n y_n$. Thus, in the 1-dimensional case, where $\mathbf{X}$ and $\mathbf{y}$ are Nx1 vectors, $w^*$ is given by the expression above.
+
+\bigskip
+\noindent\textbf{Solution 3.4:}\\
+No. None of the steps in the derivations above (linearity of expectation, differentiation, Law of Large Numbers) relied on an assumption that variables $x$ and $y$ are jointly Gaussian. Furthermore, the cs181-textbook shows that solving for $w^*$ by minimizing the loss function, as we did in this problem, is equivalent to maximizing the probability under the assumption of a linear model with Gaussian noise. Thus, we can clearly use this process for models in which $x$ and $y$ are not jointly Gaussian.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -357,18 +473,95 @@ Given the quality of this fit, do you believe that the number of sunspots contro
 \end{enumerate}
 \end{framed}
 
+\newpage
 
+\noindent\textbf{Solution 4.1:}\\
+(a)
+\begin{center}
+    \includegraphics[scale=0.5]{4.1a.png}
+\end{center}
+(b)
+\begin{center}
+    \includegraphics[scale=0.5]{4.1b.png}
+\end{center}
+(c)
+\begin{center}
+    \includegraphics[scale=0.5]{4.1c.png}
+\end{center}
+(d)
+\begin{center}
+    \includegraphics[scale=0.5]{4.1d.png}
+\end{center}
+
+\smallskip
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Basis & Residual sum of squares error \\ 
+ \hline\hline
+ (a) & $394.9803839890881$ \\
+ \hline
+ (b) & $54.27309661671943$ \\ 
+ \hline
+ (c) & $1082.8088559867188$ \\ 
+ \hline
+ (d) & $39.00107715663492$ \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+\bigskip
+\noindent\textbf{Solution 4.2:}\\
+(a)
+\begin{center}
+    \includegraphics[scale=0.5]{4.2a.png}
+\end{center}
+(c)
+\begin{center}
+    \includegraphics[scale=0.5]{4.2c.png}
+\end{center}
+(d)
+\begin{center}
+    \includegraphics[scale=0.5]{4.2d.png}
+\end{center}
+
+\smallskip
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Basis & Residual sum of squares error \\ 
+ \hline\hline
+ (a) & $351.2279357741859$ \\
+ \hline
+ (c) & $375.10675778167405$ \\ 
+ \hline
+ (d) & $2.186325095811903 \times 10^{-22}$ \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+\smallskip
+\noindent Basis (d) provided the "best" fit for the training data in terms of least squares loss, but this is not necessarily easily generalizable given how it seems to overfit these data. Therefore, (a) seems more generalizable and can be argued to provide the "best" fit.\\
+
+\noindent Even though basis (d) fit the data very well, simple logic tells is that the number of sunspots does not control the number of Republicans in the senate. This is an example of the old adage that "correlation does not equal causation"; in other words, regression can tell us that there is an association between two variables, but we cannot necessarily infer causality. Thus, even though we can make a model that fits the training data, it does not mean that sunspots control number of republicans.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
+Ben Ray
 
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?\\
+\smallskip
+Worked with Elias Nuwara\\
+Skyler's Code Review notes and Stack Overflow for help with Python syntax\\
+CS 181 Office hours
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
+Approximately how long did this homework take you to complete (in hours)?\\
+\smallskip
+20
 
 \end{document}
