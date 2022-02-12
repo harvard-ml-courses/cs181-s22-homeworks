@@ -145,7 +145,7 @@ if __name__ == "__main__":
         model3.fit(x_transformed3, y)
         all_models.append(model3)
     # Here x and y contain last dataset:
-    visualize_prediction_lines(x, y, all_models, basis3, "exampleplot")
+    visualize_prediction_lines(x, y, all_models, basis3, "Basis3")
 
     # Basis 2
     all_models = []
@@ -156,7 +156,7 @@ if __name__ == "__main__":
         model2.fit(x_transformed2, y)
         all_models.append(model2)
     # Here x and y contain last dataset:
-    visualize_prediction_lines(x, y, all_models, basis2, "exampleplot")
+    visualize_prediction_lines(x, y, all_models, basis2, "Basis2")
 
     # Basis 1
     all_models = []
@@ -167,4 +167,4 @@ if __name__ == "__main__":
         model1.fit(x_transformed1, y)
         all_models.append(model1)
     # Here x and y contain last dataset:
-    visualize_prediction_lines(x, y, all_models, basis1, "exampleplot")
+    visualize_prediction_lines(x, y, all_models, basis1, "Basis1")
