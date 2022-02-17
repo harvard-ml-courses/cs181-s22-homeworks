@@ -67,7 +67,30 @@ def make_basis(xx,part='a',is_years=True):
         
     if part == "a" and not is_years:
         xx = xx/20
-        
+    
+    if part == 'a':
+        parta = []
+        for x in xx:
+            parta.append([x ** j for j in range(6)])
+        return np.array(parta)
+
+    if part == 'b':
+        partb = []
+        for x in xx:
+            partb.append([1] + [np.exp((-(x-mu) ** 2) / 25) for mu in range(1960, 2015, 5)])
+        return np.array(partb)
+
+    if part == 'c':
+        partc = []
+        for x in xx:
+            partc.append([1] + [np.cos(x / j) for j in range(1, 6)])
+        return np.array(partc)
+
+    if part == 'd':
+        partd = []
+        for x in xx:
+            partd.append([1] + [np.cos(x / j) for j in range(1, 26)])
+        return np.array(partd)
         
     return None
 
@@ -82,13 +105,48 @@ def find_weights(X,Y):
 # Compute the regression line on a grid of inputs.
 # DO NOT CHANGE grid_years!!!!!
 grid_years = np.linspace(1960, 2005, 200)
-grid_X = np.vstack((np.ones(grid_years.shape), grid_years))
-grid_Yhat  = np.dot(grid_X.T, w)
 
-# TODO: plot and report sum of squared error for each basis
+for part in ['a', 'b', 'c', 'd']:
+    grid_X = make_basis(grid_years, part)
+    w = find_weights(make_basis(years, part), Y)
+    grid_Yhat = np.dot(grid_X, w)
 
-# Plot the data and the regression line.
-plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
-plt.xlabel("Year")
-plt.ylabel("Number of Republicans in Congress")
-plt.show()
+    # TODO: plot and report sum of squared error for each basis
+    loss = sum([(Y[n] - np.dot(make_basis(years, part), w)[n]) ** 2 for n in range(len(years))])
+    print("Loss for part", part, "is", loss)
+
+    # Plot the data and the regression line.
+    plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
+    plt.xlabel("Year")
+    plt.ylabel("Number of Republicans in Congress")
+    plt.title("LSQ Regression with basis for part " + part + ")")
+    plt.text(1985, 35, "Loss =" + str(loss))
+    plt.savefig("Q4.1_part" + part + ".png")
+    plt.show()
+
+grid_sunspots = np.linspace(min(sunspot_counts[years<last_year]), max(sunspot_counts[years<last_year]), 200)
+for part in ['a', 'c', 'd']:
+    grid_X = make_basis(grid_sunspots, part, False)
+    w = find_weights(make_basis(sunspot_counts[years<last_year], part, False), Y[years<last_year])
+    grid_Yhat = np.dot(grid_X, w)
+
+    # TODO: plot and report sum of squared error for each basis
+    loss = sum([(Y[n] - np.dot(make_basis(sunspot_counts[years<last_year], part, False), w)[n]) ** 2 for n in range(len(sunspot_counts[years<last_year]))])
+    print("Loss for part", part, "is", loss)
+
+    # Plot the data and the regression line.
+    plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o', grid_sunspots, grid_Yhat, '-')
+    plt.xlabel("Number of Sunspots")
+    plt.ylabel("Number of Republicans in Congress")
+    plt.title("LSQ Regression with basis for part " + part + ")")
+    
+    if part == 'a':
+        plt.text(80, 33, "Loss =" + str(loss))
+    if part == 'c':
+        plt.text(95, 30, "Loss =" + str(loss))
+    if part == 'd':
+        plt.text(90, -200, "Loss =" + str(loss))
+    
+
+    plt.savefig("Q4.2_part" + part + ".png")
+    plt.show()

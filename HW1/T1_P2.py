@@ -30,10 +30,32 @@ x_test = np.arange(0, 12, .1)
 print("y is:")
 print(y_train)
 
+def kernel(x1, x2, tau):
+    return np.exp(-1 * (x1 - x2) * (x1 - x2) / tau)
+
 def predict_knn(k=1, tau=1):
     """Returns predictions for the values in x_test, using KNN predictor with the specified k."""
     # TODO: your code here
-    return np.zeros(len(x_test))
+    y_test = []
+    for x_new in x_test:
+
+        # find all kernel distances between x and xdata
+        dists = [kernel(x_old, x_new, tau=1) for x_old in x_train]
+
+        # find indices of min k dists
+        min_dists = sorted(dists, reverse=True)[0:k]
+        min_indices = []
+        for dist in min_dists:
+            index = dists.index(dist)
+            min_indices.append(index)
+            dists[index] = -1 # make sure repeated point doesn't get chosen twice
+
+        # choose k points from data
+        closest_y = [y_train[i] for i in min_indices]
+        print("x is", x_new, "closest y are", closest_y)
+        
+        y_test.append(sum(closest_y) / k)
+    return y_test
 
 
 def plot_knn_preds(k):
