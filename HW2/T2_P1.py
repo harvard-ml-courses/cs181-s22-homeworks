@@ -48,7 +48,7 @@ class LogisticRegressor:
     #     return sum
     
     def __gradient(self, x, y):
-        gradients = np.zeros(len(self.W))
+        gradients = np.array([np.zeros(len(self.W))])
         for x_n, y_n in zip(x, y):
             y_hat = self.predict(x_n)
             gradients += (y_hat - y_n) * x_n    
@@ -65,7 +65,7 @@ class LogisticRegressor:
         
         gradients = self.__gradient(x, y)
         for _ in range(self.runs):
-            self.W = self.W - self.eta * gradients
+            self.W = self.W - self.eta * gradients.T
             gradients = self.__gradient(x, y)
 
     # TODO: Fix this method!
