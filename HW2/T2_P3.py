@@ -16,7 +16,7 @@ from T2_P3_KNNModel import KNNModel
 
 # Logistic Regression hyperparameters
 eta = 0.001 # Learning rate
-lam = 0.1 # Lambda for regularization
+lam = 0.001 # Lambda for regularization
 
 # Whether or not you want the plots to be displayed
 show_charts = True

@@ -40,7 +40,7 @@ class LogisticRegression:
         classification_probs = self.__softmax(np.dot(self.W, X.T)) # 3 x 27
 
         gradients = np.dot((classification_probs - one_hot_matrix), X) # 3 x 3
-
+        
         reg_gradients = gradients + 2 * self.lam * self.W # 3 x 3
 
         return reg_gradients
