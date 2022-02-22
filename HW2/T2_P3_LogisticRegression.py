@@ -64,7 +64,6 @@ class LogisticRegression:
         gradients = self.__gradient(X, y) # 3 x 3
         for _ in range(self.runs):
             self.W = self.W - self.eta * gradients
-            print(self.W)
             gradients = self.__gradient(X, y)
 
     # TODO: Implement this method!
