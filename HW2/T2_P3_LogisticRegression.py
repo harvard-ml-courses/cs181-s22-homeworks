@@ -43,11 +43,6 @@ class LogisticRegression:
 
         reg_gradients = gradients + 2 * self.lam * self.W # 3 x 3
 
-        # for i, row in enumerate(classification_probs):
-        #     real_probs = np.array(np.zeros(3))
-        #     real_probs[y[i]] = 1
-        #     gradients += (row - real_probs) * X[i]
-        # reg_gradients = gradients + 2 * self.lam * self.W
         return reg_gradients
 
     # TODO: Implement this method!
