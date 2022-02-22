@@ -15,7 +15,7 @@ from T2_P3_KNNModel import KNNModel
 # adjust these as you try to find the best fit for each classifier.
 
 # Logistic Regression hyperparameters
-eta = 0.1 # Learning rate
+eta = 0.001 # Learning rate
 lam = 0.1 # Lambda for regularization
 
 # Whether or not you want the plots to be displayed
