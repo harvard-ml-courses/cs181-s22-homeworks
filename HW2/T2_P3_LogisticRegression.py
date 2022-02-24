@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 
 # Please implement the fit(), predict(), and visualize_loss() methods of this
@@ -13,6 +13,8 @@ class LogisticRegression:
         self.eta = eta
         self.lam = lam
         self.runs = 200000
+        self.losses = []
+        self.loss = 0
 
     # Just to show how to make 'private' methods
     def __dummyPrivateMethod(self, input):
@@ -32,17 +34,19 @@ class LogisticRegression:
 
     def __gradient(self, X, y):
         # gradients = np.zeros(self.W.shape) # 3 x 3
-        
         one_hot_matrix = np.zeros((3, X.shape[0])) # 3 x 27
         for i, elt in enumerate(y):
             one_hot_matrix[elt][i] = 1
 
         classification_probs = self.__softmax(np.dot(self.W, X.T)) # 3 x 27
-
+        
         gradients = np.dot((classification_probs - one_hot_matrix), X) # 3 x 3
         
         reg_gradients = gradients + 2 * self.lam * self.W # 3 x 3
 
+        self.loss = 0
+        self.loss = - np.sum(np.dot(one_hot_matrix, np.log(classification_probs.T)))
+        
         return reg_gradients
 
     # TODO: Implement this method!
@@ -60,6 +64,7 @@ class LogisticRegression:
         for _ in range(self.runs):
             self.W = self.W - self.eta * gradients
             gradients = self.__gradient(X, y)
+            self.losses.append(self.loss)
 
     # TODO: Implement this method!
     def predict(self, X_pred):
@@ -73,4 +78,6 @@ class LogisticRegression:
 
     # TODO: Implement this method!
     def visualize_loss(self, output_file, show_charts=False):
-        pass
+        plt.plot(self.losses)
+        plt.show
+
