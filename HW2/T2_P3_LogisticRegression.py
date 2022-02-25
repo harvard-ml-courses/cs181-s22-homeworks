@@ -80,5 +80,7 @@ class LogisticRegression:
     # TODO: Implement this method!
     def visualize_loss(self, output_file, show_charts=False):
         plt.plot(self.losses)
+        plt.xlabel('Number of Iterations')
+        plt.ylabel('Negative Log-Likelihood Loss')
         plt.show
 
