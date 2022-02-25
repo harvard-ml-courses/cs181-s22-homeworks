@@ -40,19 +40,12 @@ class LogisticRegressor:
     def __sigmoid(self, z):
         return 1 / (1 + pow(np.e, -z))
     
-    # def __neg_log_loss(self, x, y):
-    #     sum = 0
-    #     for x_n, y_n in zip(x, y):
-    #         y_hat = self.predict(x_n)
-    #         sum -= y_n * np.log(y_hat) + (1 - y_n) * np.log(1 - y_hat)
-    #     return sum
-    
     def __gradient(self, x, y):
         gradients = np.array([np.zeros(len(self.W))])
         for x_n, y_n in zip(x, y):
             y_hat = self.predict(x_n)
             gradients += (y_hat - y_n) * x_n    
-        return gradients
+        return gradients / x.shape[0]
         
 
     # TODO: Optimize w using gradient descent
@@ -66,7 +59,7 @@ class LogisticRegressor:
         gradients = self.__gradient(x, y)
         for _ in range(self.runs):
             self.W = self.W - self.eta * gradients.T
-            gradients = self.__gradient(x, y)
+            gradients = self.__gradient(x, y) 
 
     # TODO: Fix this method!
     def predict(self, x):

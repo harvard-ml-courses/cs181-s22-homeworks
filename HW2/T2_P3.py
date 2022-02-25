@@ -111,9 +111,9 @@ visualize_boundary(knn5, X, y, 'knn5_result')
 
 # Setting up some sample data
 X_test = np.array([[6, 2]])
-# y_nb1 = nb1.predict(X_test)
-# y_nb2 = nb2.predict(X_test)
-# y_lr = lr.predict(X_test)
+y_nb1 = nb1.predict(X_test)
+y_nb2 = nb2.predict(X_test)
+y_lr = lr.predict(X_test)
 y_knn1 = knn1.predict(X_test)
 y_knn3 = knn3.predict(X_test)
 y_knn5 = knn5.predict(X_test)

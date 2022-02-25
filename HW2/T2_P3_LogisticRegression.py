@@ -45,8 +45,9 @@ class LogisticRegression:
         reg_gradients = gradients + 2 * self.lam * self.W # 3 x 3
 
         self.loss = 0
-        self.loss = - np.sum(np.dot(one_hot_matrix, np.log(classification_probs.T)))
-        
+        for row in range((classification_probs.shape)[0]):
+            self.loss -= np.dot(one_hot_matrix[row], np.log(classification_probs[row].T))
+
         return reg_gradients
 
     # TODO: Implement this method!

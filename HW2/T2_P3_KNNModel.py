@@ -29,35 +29,32 @@ class KNNModel:
 
     # TODO: Implement this method!
     def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
-        y_hat = np.zeros(((X_pred.shape)[0], 1))
-        
-        # List of lists: will store the distances between every x_test point and x_0 to x_6
+        # List of lists: will store the distances between every x_test point and x_i
         k_dist = []
 
         for vec in X_pred:
             lst = []
-            for i, comparison in enumerate(X_pred):
+            for i, comparison in enumerate(self.X):
                 distance = self.__distance(vec, comparison)
                 lst.append((i, distance))
-            lst.sort(key=self.__takeSecond, reverse=True)
+            lst.sort(key=self.__takeSecond)
             k_dist.append(lst)
-
+        
+        class_list = []
         for n, lst in enumerate(k_dist):
             knn_reg = []
             for i, (j, _dist) in enumerate(lst):
                 if i < self.K:
                     knn_reg.append(self.y[j])
                 else:
-                    y_hat[n] = knn_reg
+                    class_list.append(knn_reg)
                     break
-        
-        for i, preds in enumerate(y_hat):
-            y_hat[i] = max(set(preds), key = preds.count)
 
-        return y_hat
+        y_hat = []
+        for lst in class_list:
+            y_hat.append(max(set(lst), key = lst.count))
+
+        return np.array(y_hat)
 
     # In KNN, "fitting" can be as simple as storing the data, so this has been written for you
     # If you'd like to add some preprocessing here without changing the inputs, feel free,
