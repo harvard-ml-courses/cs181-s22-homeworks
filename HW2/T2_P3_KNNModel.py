@@ -16,15 +16,37 @@ class KNNModel:
     def __dummyPrivateMethod(self, input):
         return None
 
+    def __dist(self, star1, star2):
+        return ((star1[0] - star2[0])/3) ** 2 + (star1[1] - star2[1]) ** 2
+
     # TODO: Implement this method!
     def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
         preds = []
-        for x in X_pred:
-            z = np.cos(x ** 2).sum()
-            preds.append(1 + np.sign(z) * (np.abs(z) > 0.3))
+        for x_new in X_pred:
+
+            # find distances between all neighbors of x_new
+            dists = []
+            for x_old in self.X:
+                star_dist = self.__dist(x_old, x_new)
+                if star_dist > 0:
+                    dists.append(star_dist)
+                else: # make sure testing point isn't same as training point
+                    dists.append(float('inf'))
+
+            # sort distances and choose k smallest
+            sorted_dists = sorted(dists)
+            knn_dists = sorted_dists[0:self.K]
+
+            # find k indices that correspond to k smallest distances
+            knn_indices = []
+            for n in knn_dists:
+                knn_index = dists.index(n)
+                knn_indices.append(knn_index)
+                dists[knn_index] = -1 # make sure same index isn't chosen twice
+
+            # find y that correspond to indices of knn
+            knn_y = [self.y[i] for i in knn_indices]
+            preds.append(max(set(knn_y), key=knn_y.count))
         return np.array(preds)
 
     # In KNN, "fitting" can be as simple as storing the data, so this has been written for you
