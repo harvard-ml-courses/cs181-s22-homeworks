@@ -20,6 +20,7 @@
 \usepackage{common}
 \usepackage{enumitem}
 \usepackage{bm}
+\usepackage{bbm}
 \newcommand{\B}{\text{B}}
 \newcommand{\Beta}{\text{Beta}}
 
@@ -156,11 +157,35 @@ Moreover, each plot also displays 1 of the randomly generated datasets and highl
 \newpage
 
 \subsection*{Solution}
+\noindent\textbf{Solution 1.1:}\\
+See \verb|T2_P1.py| in Gradescope HW2 - Supplemental.\\
+
+\noindent\textbf{Solution 1.2:}\\
+\begin{center}
+    \includegraphics[scale=0.7]{Basis1.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.7]{Basis2.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.7]{Basis3.png}
+\end{center}
+
+\noindent\textbf{Solution 1.3:}\\
+Bias is depicted by the difference between the black line (mean learned model) and green line (ground truth model), while variance is depicted by the variation of the purple line/faint lines in the background (individual learned models) from the black line. 
+
+It is clear that that Basis1 is underfitting the data, as it produces a very simple mean learned model (the average of linear learned models); it has high bias (the mean learned model is hardly similar to the ground truth model) but low variance (the individual learned models are very similar to the mean learned model). By comparison, Basis3 is overfitting the data as it produces a more complicated mean learned model (the average of 5th order polynomials); it has a low bias (the mean learned model is more similar to the ground truth model) but high variance (the individual learned models have a large spread from the mean learned model, e.g. look at the difference between the purple and black lines to the left of the figure). Basis2's learned model (the average of 3rd order polynomials) has a bias and variance in between Basis1 and Basis3.
+
+Overall, this is in line with the theory of more complicated models having low bias and high variance, whilst simpler models have high bias and low variance. Basis1 arguably fits the data least well because a linear model simply cannot predict the features of the sinusoidal ground truth model. Basis3 arguably approximates the true process best because it has low bias, but it is also arguably overfitting and suffers from high variance. Basis2 arguably best optimizes for the bias-variance tradeoff - it follows the ground truth model more closely (lower bias) than Basis1, and the individual learned models are closer to the mean learned model (lower variance) than Basis3.\
+
+\noindent\textbf{Solution 1.4:}\\
+Increasing the number of data points in the training data can decrease the variance. This will be more pronounced in the case of Basis3, which has a higher variance and will be more sensitive to the addition of additional training data (it will effectively overfit to the additional data, leading to the individual learned models being closer to the mean learned model). 
+
+However, increasing the number of data points will not change the bias because the bias is caused by the features of the model rather than the amount of data we have to fit to. For example, Basis1 produces linear models; a line that is a better weighted average of more training data will not result in a curve that begins to look sinusoidal - it's still a line!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{problem}[Maximum likelihood in classification, 15pts]
 
   Consider now a generative $K$-class model.  We adopt class prior
@@ -235,6 +260,140 @@ $\boldX^{-\top} := (\boldX^{\top})^{-1}$
 
 
 \subsection*{Solution}
+
+\noindent\textbf{Solution 2.1:}\\
+The likelihood of the data set is given by:
+\begin{align*}
+    p(D ; \bpi) &= p(\{(\boldx_i, \boldy_i)\}_{i=1}^n; \bpi)\\
+    &= \prod_{i=1}^{n} p(\{(\boldx_i, \boldy_i)\}_{i=1}; \bpi)
+\end{align*}
+
+In order to calculate this probability, consider the probability of seeing one data point given the parameters:
+\begin{align*}
+    p(\{(\boldx_i, \boldy_i)\}; \bpi) &= \prod_{k=1}^{K} p(\{\boldx_i; \boldy_i = C_k, \bpi) p(\boldy_i = C_k; \bpi)\\
+    &= \prod_{k=1}^{K} p(\{\boldx_i; \boldy_i = C_k, \bpi)  \bpi_k
+\end{align*}
+
+Therefore, the likelihood of the data set can be re-written as:
+\begin{align*}
+    p(D ; \bpi) &= \prod_{i=1}^{n} \prod_{k=1}^{K} p(\{\boldx_i; \boldy_i = C_k, \bpi)  \bpi_k
+\end{align*}
+
+Taking the log of the likelihood, we can convert logarithms of products to sums of logarithms multiplied by the indicator $\mathbbm{1}_{\boldy_i = C_k}$, such that we only sum the logarithms of probabilities for data that are in the correct class. Thus, we get the log-likelihood of the data set:
+\begin{align*}
+    \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (\ln[p(\{\boldx_i; \boldy_i = C_k, \bpi)] + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k}
+\end{align*}
+
+\noindent\textbf{Solution 2.2:}\\
+To find the maximum-likelihood estimator for the prior probabilities, we solve the following constrained optimization problem:
+\begin{align*}
+    \max_{\bpi} p(D ; \bpi)\  \text{s.t.}\ \sum_{k=1}^{K}\pi_k - 1 = 0
+\end{align*}
+
+Turning this into an unconstrained maximization problem using a Lagrangian yields:
+\begin{align*}
+    L(\bpi_k, \lambda) = \sum_{i=1}^{n} \sum_{k=1}^{K} (\ln[p(\{\boldx_i; \boldy_i = C_k, \bpi)] + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k} + \lambda ( \sum_{k=1}^{K}\pi_k - 1)
+\end{align*}
+
+Now, take the derivative with respect to $\lambda$ and take K derivatives with respect to $\bpi_1, ..., \bpi_K$:
+\begin{align*}
+    \frac{\delta L}{\delta \lambda} &= \sum_{k=1}^{K}\pi_k - 1\\
+    \frac{\delta L}{\delta \bpi_k} &= \sum_{i=1}^{n} \frac{1}{\bpi_k} \mathbbm{1}_{\boldy_i = C_k} + \lambda
+\end{align*}
+
+The Lagrangian is maximized when these derivatives equal 0:
+\begin{align}
+    \sum_{k=1}^{K}\pi_k &= 1\\
+    \sum_{i=1}^{n} \frac{1}{\bpi_k} \mathbbm{1}_{\boldy_i = C_k} &= - \lambda
+\end{align}
+
+Rearranging equation (2):
+\begin{align*}
+    \bpi_k &= - \frac{1}{\lambda}\sum_{i=1}^{n} \mathbbm{1}_{\boldy_i = C_k}\\
+    &= - \frac{1}{\lambda} N_k
+\end{align*}
+where $N_k$ is defined as the number of data points $(\boldx_i,
+\boldy_i)$ in class $k$.\\
+
+Substituting this into equation (1):
+\begin{align*}
+    \sum_{k=1}^{K} \frac{1}{\lambda} N_k &= 1\\
+    - \sum_{k=1}^{K} N_k &= \lambda\\
+    \lambda = -N
+\end{align*}
+where $N$ is defined as the number of data points $(\boldx_i,
+\boldy_i)$ in the data set.\\
+
+Putting this all together, we get maximum-likelihood estimator for the prior class-membership probabilities, $\hat \pi_k$:
+\begin{align*}
+    \hat \pi_k = \frac{N_k}{N}
+\end{align*}
+
+This is intuitive because the probability of being in a given class $C_k$ equals the number of data points in that class $N_k$ divided by the total number of data points $N$ (i.e. the fraction of data points that are assigned to class $C_k$).\\
+
+\noindent\textbf{Solution 2.3:}\\
+Given $p(\boldx | \boldy = C_k) = \mathcal{N}(\boldx |  \bmu_k, \bSigma)$, the log-likelihood can be rewritten as:
+\begin{align*}
+    \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (\ln[\mathcal{N}(\boldx |  \bmu_k, \bSigma)] + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k}\\
+\end{align*}
+
+The Gaussian distribution can be re-written in terms of its PDF, abstracting all terms not containing $\bmu_k$ into a constant $c$:
+\begin{align*}
+    \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (-\frac{1}{2} (\boldx_i - \bmu_k)^{\top} \bSigma^{-1}(\boldx_i - \bmu_k) + c) + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k}
+\end{align*}
+
+Using the Matrix Cookbook formulae yields the gradient of the log-likelihood with respect to $\bmu_k$ for a given $k$:
+\begin{align*}
+    \nabla_{\bmu_k} \ln p(D ; \bpi) &= \sum_{i=1}^{n} \bSigma^{-1} (\boldx_i - \bmu_k) \mathbbm{1}_{\boldy_i = C_k}\\
+    &= \bSigma^{-1}  (\sum_{i=1}^{n} [\boldx_i \mathbbm{1}_{\boldy_i = C_k}] - N_k \bmu_k)
+\end{align*}
+
+\noindent\textbf{Solution 2.4:}\\
+The maximum-likelihood estimator $\hat \bmu_k$ for $\bmu_k$ is found by setting the gradient equal to 0:
+\begin{align*}
+    \bSigma^{-1}  (\sum_{i=1}^{n} \boldx_i \mathbbm{1}_{\boldy_i = C_k} - N_k \bmu_k) = 0\\
+    \hat \bmu_k = \frac{1}{N_k} \sum_{i=1}^{n} \boldx_i \mathbbm{1}_{\boldy_i = C_k}\\
+\end{align*}
+
+This is intuitive as $\hat \bmu_k$ is simply the average of all the data points $\boldx_i$ assigned to class $C_k$.\\
+
+\noindent\textbf{Solution 2.5:}\\
+Recall the log-likelihood function with Gaussian class-conditional probabilities:
+\begin{align*}
+    \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (\ln[\mathcal{N}(\boldx |  \bmu_k, \bSigma)] + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k}\\
+\end{align*}
+
+The Gaussian distribution can be re-written in terms of its PDF, abstracting all terms not containing $\bSigma$ into a constant $c$:
+\begin{align*}
+    \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (-\frac{1}{2} (\boldx_i - \bmu_k)^{\top} \bSigma^{-1}(\boldx_i - \bmu_k) - \frac{1}{2} \ln[\det(\bSigma)] + c) + \ln[\bpi_k]) \mathbbm{1}_{\boldy_i = C_k}
+\end{align*}
+
+Using the Matrix Cookbook formulae yields the gradient of the log-likelihood with respect to $\bSigma$:
+\begin{align*}
+    \nabla_{\bSigma} \ln p(D ; \bpi) &= \sum_{i=1}^{n} \sum_{k=1}^{K} (- \frac{1}{2} \bSigma^{-\top} (\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top}\bSigma^{-\top} + \frac{1}{2} \bSigma^{-\top}) \mathbbm{1}_{\boldy_i = C_k}\\
+    &= - \frac{1}{2} \bSigma^{-\top} \sum_{i=1}^{n} \sum_{k=1}^{K} ((\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top}\bSigma^{-\top} - \boldI) \mathbbm{1}_{\boldy_i = C_k}\\
+\end{align*}
+
+\noindent\textbf{Solution 2.6:}\\
+The maximum-likelihood estimator $\hat \bSigma$ for $\bSigma$ is found by setting the gradient equal to 0:
+\begin{align*}
+    - \frac{1}{2} \bSigma^{-\top} \sum_{i=1}^{n} \sum_{k=1}^{K} ((\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top}\bSigma^{-\top} - \boldI) \mathbbm{1}_{\boldy_i = C_k} = 0
+\end{align*}
+
+Multiplying both sides by $\bSigma^{\top}$ from the left and right (with the effect of
+retaining $\bSigma^{\top}$ in only the second term, since $\bSigma^{\top} \bSigma^{-\top} = \bSigma^{-\top} \bSigma^{\top} = \boldI$), and multiplying by $-2$, we have:
+\begin{align*}
+    \sum_{i=1}^{n} \sum_{k=1}^{K} ((\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top} - \bSigma^{\top}) \mathbbm{1}_{\boldy_i = C_k} &= 0\\
+    \sum_{i=1}^{n} \sum_{k=1}^{K} (\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top} \mathbbm{1}_{\boldy_i = C_k} &= N \bSigma^{\top}
+\end{align*}
+
+Rearranging to solve for $\hat \bSigma$, the maximum likelihood estimator for $\bSigma$, and recognizing that covariance matrices are symmetric, and so
+$\bSigma^{\top} = \bSigma$, we have:
+\begin{align*}
+    \hat \bSigma = \frac{1}{N} \sum_{i=1}^{n} \sum_{k=1}^{K} (\boldx_i - \bmu_k)(\boldx_i - \bmu_k)^{\top} \mathbbm{1}_{\boldy_i = C_k}
+\end{align*}
+
+This is intuitive as the maximum likelihood solution for the shared covariance matrix is the weighted average of the individual covariance matrices for each class. Note that in the sum, we only include terms in the individual covariance matrices when the indicator $\mathbbm{1}_{\boldy_i = C_k} = 1$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 3
@@ -342,21 +501,110 @@ You'll also need to modify the hyperparameter
 values in \texttt{T2\_P3.py} for logistic regression.
 \end{framed}
 
+\newpage
 
 \subsection*{Solution}
+\noindent\textbf{Solution 3.1:}\\
+(a) Three-class generalization of logistic regression
+\begin{center}
+    \includegraphics[scale=0.7]{logistic_regression_result.png}
+\end{center}
+
+(b) Generative classifier with Gaussian class-conditional densities with a \textit{shared} covariance matrix across all classes
+\begin{center}
+    \includegraphics[scale=0.7]{generative_result_shared_covariances.png}
+\end{center}
+
+(c) Generative classifier with Gaussian class-conditional densities with a \textit{separate} covariance matrix for each class
+\begin{center}
+    \includegraphics[scale=0.7]{generative_result_separate_covariances.png}
+\end{center}
+
+(d) kNN classifier based on $k = 1, 3, 5$ nearest neighbors
+\begin{center}
+    \includegraphics[scale=0.7]{HW2/knn1_result.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.7]{HW2/knn3_result.png}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.7]{HW2/knn5_result.png}
+\end{center}
+
+Logistic regression produces linear decision boundaries between classes, derived by gradient descent. It correctly classifies all the training data poiints
+
+The generative Gaussian model with shared covariances looks quite similar to the logistic regression model (albeit misclassifying a few points far from their class' mean), but the difference in the algorithm becomes much more apparent when we look at the generative model with separate covariances: the curved decision boundaries appear similar to the shape of a Gaussian PDF (particularly if you look at the higher density of blue classification directly around the cluster of Giant stars which tails off above and below). Furthermore, when using separate covariances, it is apparent that Giant and Supergiant stars, which have less variance in Magnitude than Dwarf stars, have tighter distributions surrounding them - an expected feature of a Gaussian model and a sign of overfitting. Thus, as expected, the generative Gaussian model with separate covariances perfectly classifies all of the training data. 
+
+Finally, the kNN classifier has very ``choppy" decision boundaries as the classiifier at every point is determined locally based on the nearest k surrounding points. It misclassifies more points in the training data as k increases, as expected, since larger values of k take into account stars that are further away from the point for which you are trying to predict a class. This is particularly noticeable when looking at (1) the Dwarf stars that get misclassified as k rises, and (2) the way that the lower part of the blue region gets closer to the coolest (lowest temparature) Giant star as k rises.\\
+
+\noindent\textbf{Solution 3.2:}\\
+Below is a plot of the loss vs. number of iterations with $\eta = \lambda = 0.001$. These were reasonable choices as the loss decreased almost exponentially as the number of iterations increased, and resulted in perfect classification of the training data, without visibly obvious overfitting (which we saw in other models).
+
+Changing the learning rate ($\eta$) changes the step size for gradient descent. Larger values of $\eta$ can cause a faster rate of convergence but can sometimes miss (step over / step past) the minimum point, causing larger loss.
+
+Changing the regularization strength ($\lambda$) changes the impact of outliers on the weights used in our logistic regression. A larger $\lambda$ leads to higher loss as it can cause the model to underfit the data. On the other hand, a smaller $\lambda$ leads to lower loss but also greater overfitting of the training data.
+\begin{center}
+    \includegraphics[scale=0.7]{HW2/logistic_regression_loss.png}
+\end{center}
+
+\noindent\textbf{Solution 3.3:}\\
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Gaussian generative model with... & Negative log-likelihood loss \\ 
+ \hline\hline
+ Shared covariance matrix & $-116.57191681902043$ \\
+ \hline
+ Separate covariance matrix & $-64.17309552244006$ \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+The Gaussian generative model with separate covariance matrices has lower loss as the individual covariance matrices more accurately describe the variance observed in the training data in each class, allowing the classification to more closely fit the data. For example, the variance in Magnitudes of Dwarf stars is far greater than that of Giant stars or Dwarfs. Such detail is excluded when using a MLE for the shared covariance matrix, which takes a weighted average of the individual covariance matrices. Thus, using separate covariance matrices results in lower loss.
+
+\noindent\textbf{Solution 3.4:}\\
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Model & Class of star with Mag. = 6 and Temp. = 2 \\ 
+ \hline\hline
+ Logistic Regression & Giant \\
+ \hline
+ Shared Covariance Gaussian & Giant \\ 
+ \hline
+ Separate Covariance Gaussian & Dwarf\\
+ \hline
+ KNN Model with k=1 & Dwarf\\
+ \hline
+ KNN Model with k=3 & Dwarf\\
+ \hline
+ KNN Model with k=5 & Dwarf\\
+ \hline
+\end{tabular}
+\end{center}
+
+There are two ways in which we can interpret the trustworthiness of the models:
+\begin{enumerate}
+    \item 4 of the models predicted the star with Magnitude = 6 and Temperature = 2 was a Dwarf star, while only 2 said it was a Giant star. Given the majority of models classified the star as a Dwarf, we can argue that these models are more trustworthy than the others which classified the star as a Giant.
+    \item The decision boundaries in the logistic regression model and in the generative Gaussian model with shared covariances are quite similar, but are dissimilar to the separate covariances equivalent or kNN models. Since we have managed to create similar decision boundaries with two completely different models, both of which classify the star with Magnitude = 6 and Temperature = 2 as a Giant, we could arguably trust the models producing Giant predictions more.
+\end{enumerate}
+Therefore, we cannot definitely conclude which model is the most trustworthy using just these classifiers.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
+Ben Ray
 
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?\\
+Worked with Ty Geri, Elias Nuwara, and Angela Li\\
+CS 181 Office hours
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)?
-
+Approximately how long did this homework take you to complete (in hours)?\\
+26
 
 
 \end{document}
