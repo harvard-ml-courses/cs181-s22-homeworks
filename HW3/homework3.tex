@@ -24,6 +24,7 @@
 \newcommand{\Beta}{\text{Beta}}
 \usepackage{pythonhighlight}
 \usepackage[mmddyyyy,hhmmss]{datetime}
+\usepackage{multicol}
 
 
 \setlength\parindent{0em}
@@ -133,8 +134,119 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
   \end{enumerate}
 
   \end{problem}
+\newpage
 
 \subsection*{Solution:}
+\noindent\textbf{Solution 1.1:}\\
+Using Bayes' Rule:
+\begin{align*}
+    p(\mu|D) &= \frac{p(D|\mu)p(\mu)}{p(D)}\\
+    &\propto p(D|\mu)p(\mu)\\
+    &\propto p(\{x_i\}_{i=1}^{n}|\mu)p(\mu)
+\end{align*}
+Given the $x_i$'s are iid, and $x_i \sim \mu + \epsilon$ where $\epsilon \sim\mathcal{N}(0,\sigma^2)$, we deduce that $x_i \sim \mathcal{N}(\mu,\sigma^2)$. Additionally, the prior on $\mu$ is given in the question:
+\begin{align*}
+     p(\mu|D) &\propto \left[ \prod_{i=1}^{n} \frac{1}{\sigma\sqrt{2\pi}} \exp\left( -\frac{1}{2 \sigma^2}\left(x_i-\mu\right)^{2}\right) \right] \frac{1}{\tau\sqrt{2\pi}} \exp\left( -\frac{1}{2 \tau^2}\left(\mu - 0\right)^{2}\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(-\frac{1}{2 \tau^2}\mu^{2} - \sum_{i=1}^{n} \frac{1}{2 \sigma^2}\left(x_i-\mu\right)^{2}\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(-\frac{1}{2 \tau^2}\mu^{2} - \sum_{i=1}^{n} \frac{1}{2 \sigma^2}\left(x_i^2-2 x_i \mu + \mu^2 \right)\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(-\frac{1}{2 \tau^2}\mu^{2} - \frac{n}{2 \sigma^2}\mu^{2} + \frac{\mu}{\sigma^2} \sum_{i=1}^{n} x_i - \frac{1}{2 \sigma^2} \sum_{i=1}^{n} x_i^2\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(a\mu^2 + b\mu + c\right)
+\end{align*}
+where $a = -\frac{1}{2 \tau^2} - \frac{n}{2 \sigma^2}$, $b = \frac{1}{\sigma^2} \sum_{i=1}^{n} x_i$, and $c = - \frac{1}{2 \sigma^2} \sum_{i=1}^{n} x_i^2$.\\
+
+Completing the square inside the exponent, and dropping constant terms not involving $\mu$, given proportionality (not equality):
+\begin{align*}
+    p(\mu|D) &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(a\left(\mu^2 + \frac{b}{a}\mu + \frac{c}{a}\right)\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(a\left(\mu + \frac{b}{2a}\right)^2 + c - \frac{b^2}{4a}\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{\tau\sqrt{2\pi}} \exp\left(c - \frac{b^2}{4a}\right) \exp\left(a\left(\mu + \frac{b}{2a}\right)^2\right)\\
+    &\propto \exp\left(a\left(\mu + \frac{b}{2a}\right)^2\right)
+\end{align*}
+By normal-normal conjugacy, we know that the posterior on $\mu$ will be normal (given $\mu$ has a normal prior). Thus, $\mu|D \sim \mathcal{N}(\mu_{\mu}, \sigma_{\mu}^2)$, so the PDF of $\mu|D$ is:
+\begin{align*}
+    p(\mu|D) = \frac{1}{\sigma_{\mu}\sqrt{2\pi}} \exp\left( -\frac{1}{2 \sigma_{\mu}^2}\left(\mu-\mu_{\mu}\right)^{2}\right)
+\end{align*}
+In order to find $\mu_\mu$ and $\sigma_\mu$, we can simply pattern match terms in the exponent of the PDF with the simplified expression for the posterior in terms of $a$, $b$, and $c$ derived above:
+\begin{align*}
+    -\mu_\mu &= \frac{b}{2a}\\
+    -\mu_\mu &= \frac{\frac{1}{\sigma^2} \sum_{i=1}^{n} x_i}{2\left(-\frac{1}{2 \tau^2} - \frac{n}{2 \sigma^2}\right)}\\
+    \therefore \mu_\mu &= \frac{\tau^2 \sum_{i=1}^n x_i}{n\tau^2 + \sigma^2}
+\end{align*}
+\begin{align*}
+    -\frac{1}{2 \sigma_{\mu}^2} &= a\\
+    -\frac{1}{2 \sigma_{\mu}^2} &= -\frac{1}{2 \tau^2} - \frac{n}{2 \sigma^2}\\
+    \therefore \sigma_{\mu}^2 &= \frac{\sigma^2 \tau^2}{n \tau^2 + \sigma^2}
+\end{align*}
+
+Thus, the distribution of $\mu | D$ is given by:
+\begin{align*}
+    \mu|D \sim \mathcal{N}\left(\frac{\tau^2 \sum_{i=1}^n x_i}{n\tau^2 + \sigma^2}, \frac{\sigma^2 \tau^2}{n \tau^2 + \sigma^2}\right)
+\end{align*}
+
+\noindent\textbf{Solution 1.2(a):}\\
+To find $\mu_{MLE}$, we find the value of $\mu$ that minimizes the negative log likelihood (NLL) of the data:
+\begin{align*}
+    \argmin_{\mu}& \{- \ln p(D|\mu)\}\\
+    \argmin_{\mu}& \left\{K + \frac{1}{2 \sigma^2} \sum_{i=1}^n (x_i-\mu)^2\right\}
+\end{align*}
+where K is a constant term not containing $\mu$.\\
+
+Taking the derivative of the NLL with respect to $\mu$ and setting it equal to 0, yields the MLE for $\mu$:
+\begin{align*}
+    \frac{\partial [NLL]}{\partial \mu} = \frac{1}{\sigma^2} \sum_{i=1}^n (x_i-\mu) = 0\\
+    \implies \mu_{MLE}=\frac{1}{n} \sum_{i=1}^n x_i
+\end{align*}
+
+\noindent\textbf{Solution 1.2(b):}\\
+To find $\mu_{MAP}$, we find the value of $\mu$ that maximizes the posterior probability, $p(\mu | D)$. We calculated that this posterior distribution follows a normal distribution which is maximized at its mean:
+\begin{align*}
+    \mu_{MAP} = \frac{\tau^2 \sum_{i=1}^n x_i}{n\tau^2 + \sigma^2}
+\end{align*}
+
+\noindent\textbf{Solution 1.2(c):}\\
+Re-writing $\mu_{MAP}$, we discover that:
+\begin{align*}
+    \mu_{MAP} &= \tau^2 \left(\frac{\sum_{x_i\in D}x_i}{n+\frac{\sigma^2}{\tau^2}}\right)\\
+    \mu_{MAP} &= \tau^2 \mu_{x|D} \text{  where $\mu_{x|D}$ is the mean of $x|D$}
+\end{align*}
+
+\noindent\textbf{Solution 1.2(d):}\\
+Using the same logic as in 1.1, given $x \sim \mu + \epsilon$ where $\epsilon \sim N(0,\sigma^2)$, we deduce that:
+\begin{align*}
+    x|\mu^* &\sim \mathcal{N}(\mu^*,\sigma^2)\\\\
+    x|\mu_{MLE} &\sim \mathcal{N}\left(\frac{1}{n} \sum_{i=1}^n x_i,\sigma^2\right)\\\\
+    x|\mu_{MAP} &\sim \mathcal{N}\left(\frac{\tau^2 \sum_{i=1}^n x_i}{n\tau^2 + \sigma^2},\sigma^2\right)
+\end{align*}
+
+\noindent\textbf{Solution 1.2(e):}\\
+The variance of $x|D$ is greater than the variance of $x|\mu_{MLE}$. At the limit:
+\begin{align*}
+    \lim_{n\to\infty}[VAR_{x|D}]\to VAR_{x|\mu_{MLE}}
+\end{align*}
+This is intuitive because the variance of $x|D$ is calculated by marginalizing out over all the possible values of $\mu$, as oppose to using a single point estimate, $\mu_{MLE}$, to derive the distribution of $x|\mu_{MLE}$. Thus, the distribution of $x|D$ will have a higher variance than the distribution of $x|\mu_{MLE}$, and will only converge at the limit when the MLE is the mean of all n data points.\\
+
+\noindent\textbf{Solution 1.3(a):}\\
+When $\sum_{x_i \in D} x_i=0$, $\mu_{MLE} = \mu_{MAP} = 0$.\\
+
+\noindent\textbf{Solution 1.3(b):}\\
+For this question it helps to rewrite $\mu_{MLE}$ and $\mu_{MAP}$ as:
+\begin{align*}
+    \mu_{MLE} = \frac{\sum_{i=1}^n x_i}{n} \qquad \mu_{MAP} = \frac{\sum_{i=1}^n x_i}{n + \frac{\sigma^2}{\tau^2}}
+\end{align*}
+We can see that the denominator of $\mu_{MLE}$ is less than the denominator of $\mu_{MAP}$, given $\sigma$ and $\tau$ are positive.\\
+Thus, when $\sum_{x_i \in D} x_i>0$, $\mu_{MLE} > \mu_{MAP}$.\\
+
+\noindent\textbf{Solution 1.3(c):}\\
+Using the same logic as above, when $\sum_{x_i \in D} x_i<0$, $\mu_{MLE} < \mu_{MAP}$.\\
+
+\noindent\textbf{Solution 1.4:}\\
+\begin{align*}
+    \lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}} &= \lim_{n \rightarrow \infty} \frac{\left(\frac{\sum_{i=1}^n x_i}{n + \frac{\sigma^2}{\tau^2}}\right)}{\left(\frac{\sum_{i=1}^n x_i}{n}\right)}\\
+    &= \lim_{n \rightarrow \infty} \frac{n}{n + \frac{\sigma^2}{\tau^2}}\\
+    &= 1
+\end{align*}
+
+
+
 
 
 \newpage
@@ -169,16 +281,42 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
 \end{problem}
 
 \subsection*{Solution:}
+\noindent\textbf{Solution 2.1:}\\
+Using Bayes' Rule:
+\begin{align*}
+    p(\mathbf{w}|\mathbf{X}, \mathbf{y}) &= \frac{p(\mathbf{y}|\mathbf{X},\mathbf{w})p(\mathbf{w})}{p(\mathbf{y})}\\
+    &\propto p(\mathbf{y}|\mathbf{X},\mathbf{w})p(\mathbf{w})
+\end{align*}
+Given $\mathbf{y} = \mathbf{X}\mathbf{w} + \epsilon$ where $\epsilon_i \sim\mathcal{N}(0,\sigma^2)$, we deduce that $\mathbf{y}|\mathbf{X}, \mathbf{w} \sim \mathcal{N}(\mathbf{X}\mathbf{w},\sigma^2)$ and $y_i | \mathbf{x_i}, \mathbf{w} \sim \mathcal{N}(\mathbf{x}_i^\top \mathbf{w},\sigma^2)$. Additionally, the Laplacian prior on $\mathbf{w}$ is given in the question:
+\begin{align*}
+    p(\mathbf{w}|\mathbf{X}, \mathbf{y}) &\propto \left[ \prod_{i=1}^{n} \frac{1}{\sigma\sqrt{2\pi}} \exp\left( -\frac{1}{2 \sigma^2}\left(y_i- \mathbf{x}_i^\top \mathbf{w} \right)^{2}\right) \right] \frac{1}{2\tau}\exp\left(-\frac{\|\mathbf{w}-\mathbf{\mu}\|_1}{\tau}\right)\\
+    &\propto \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^n \frac{1}{2\tau} \exp\left(-\frac{\|\mathbf{w}-\mathbf{\mu}\|_1}{\tau} -\frac{1}{2 \sigma^2} \sum_{i=1}^n \left(y_i- \mathbf{x}_i^\top \mathbf{w} \right)^{2}\right)
+\end{align*}
+Finally, simplifying this expression to be an equality, up to a normalizing constant called $Z$, we get the posterior of $\mathbf{w}$:
+\begin{align*}
+    p(\mathbf{w}|\mathbf{X}, \mathbf{y}) = Z \exp\left(-\frac{\|\mathbf{w}-\mathbf{\mu}\|_1}{\tau} -\frac{1}{2 \sigma^2} \sum_{i=1}^n \left(y_i- \mathbf{x}_i^\top \mathbf{w} \right)^{2}\right)
+\end{align*}
 
+\noindent\textbf{Solution 2.2:}\\
+To find $\mathbf{w}_{MAP}$, we find the value of $\mathbf{w}$ that maximizes the posterior probability, $p(\mathbf{w} | D)$; in other words, the value of $\mathbf{w}$ that minimizes the negative log-likelihood, $- \ln p(\mathbf{w} | D)$. (Note that we can exclude constant terms not including $\mathbf{w}$ in the $\argmin$ expression):
+\begin{align*}
+    \mathbf{w}_{MAP} &= \argmin_{\mathbf{w}} \left\{ - \ln p(\mathbf{w} | D)\right\}\\
+    &= \argmin_{\mathbf{w}} \left\{ \frac{\|\mathbf{w}-\mathbf{\mu}\|_1}{\tau} +\frac{1}{2 \sigma^2} \sum_{i=1}^n \left(y_i- \mathbf{x}_i^\top \mathbf{w} \right)^{2}\right\}
+\end{align*}
+Finally, taking out a factor of $\frac{1}{2 \sigma^2}$, and noting that $\argmin_x kf(x) = \argmin_x f(x)$, we get:
+\begin{align*}
+    \mathbf{w}_{MAP} &= \argmin_{\mathbf{w}} \left\{\frac{2\sigma^2}{\tau} \|\mathbf{w}-\mathbf{\mu}\|_1 + \sum_{i=1}^n \left(y_i- \mathbf{x}_i^\top \mathbf{w} \right)^{2}\right\}
+\end{align*}
+The interpretation of this Bayesian approach is that adding a Laplacian prior over the distribution of our weight parameters and then maximizing the resulting posterior distribution is equivalent
+to the frequentist approach of adding an L1 reqularization term to least squares regression with $\lambda = \frac{2 \sigma^2}{\tau}$. A larger value of $\tau$ suggests we are less confident in the prior on $\mathbf{w}$ (Bayesian approach), which results in a smaller value for $\lambda$ and less regularization (frequentist approach).\\
+
+\noindent\textbf{Solution 2.3:}\\
+Given some prior knowledge that $\mathbf{w} \approx \mathbf{v}$, we can set the location parameter, $\mu$, in the prior on $\mathbf{w}$ equal to $\mathbf{v}$. This makes sense from a Bayesian perspective, since this incorporates prior knowledge into our prior distribution on $\mathbf{w}$, and the posterior is calculated using this information. Likewise, from a frequentist perspective, this makes sense because when we set $\mu = \mathbf{v}$, we apply more regularization when the components of $\mathbf{w}$ are far from the components of $\mathbf{v}$, which is what we want to be penalizing since we know the components of $\mathbf{w}$ should be close to the components of $\mathbf{v}$.\\
+
+\noindent\textbf{Solution 2.4:}\\
+$\tau$ decreasing is equivalent to increasing the strength of regularization. Thus, as $\tau$ decreases, the entries of $\mathbf{w}_{MAP}$ should get closer to the entries of $\mu$. As $\tau \to 0$, the entries of $\mathbf{w}_{MAP}$ should end up being equal to $\mu$.
 
 \newpage
-% FDV: We had a lot of debate about this problem, whether it's useful
-% for students to have to derive this by hand or not... if we want
-% alternatives, ideas could include
-%% (1) demonstrate the fact that there are good solutions near any
-% starting point (run restarts from many starts, see that the answers
-% have good quality but very different weights)
-% (2) do a double-descent with linear regression (using very small N).
 
 \begin{problem}[Neural Net Optimization]
 
@@ -225,9 +363,82 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
     \end{enumerate}
     
     \end{problem}
+\newpage
 
 \subsection*{Solution:}
+\noindent\textbf{Solution 3.1:}\\
+\begin{center}
+\begin{tabular}{ |c|c| } 
+ \hline
+ Parameter/Variable & Dimensions \\ 
+ \hline \hline
+ $\mathbf{x}$ & N x 1 \\ 
+ \hline
+ $\mathbf{W}_1$ & H x N \\
+ \hline
+ $\mathbf{b}_1$ & H x 1 \\ 
+ \hline
+ $\mathbf{a}_1$ & H x 1 \\ 
+ \hline
+ $\mathbf{z}_1$ & H x 1 \\ 
+ \hline
+ $\mathbf{W}_2$ & 1 x H \\
+ \hline
+ $\mathbf{b}_2$ & 1 x 1 \\
+ \hline
+ $a_2$ & 1 x 1 \\
+ \hline
+ $\hat{y} = z_2$ & 1 x 1 \\
+ \hline
+\end{tabular}
+\end{center}
 
+\noindent\textbf{Solution 3.2(a):}\\
+Applying the chain rule:
+\begin{align*}
+    \frac{\partial L}{\partial b_2} &= \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot \frac{\partial a_2}{\partial b_2}\\
+    &= \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot 1\\
+    &= - (\frac{y}{\hat{y}}-\frac{(1-y)}{1-\hat{y}}) \cdot \hat{y}(1-\hat{y})\\
+    &= \hat{y} - y
+\end{align*}
+
+\noindent\textbf{Solution 3.2(b):}\\
+Applying the chain rule:
+\begin{align*}
+    \frac{\partial L}{\partial W_2^h} &= \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot \frac{\partial a_2}{\partial W_2^h}
+\end{align*}
+Using $\frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} = \hat{y} - y$ from part (a):
+\begin{align*}
+    \frac{\partial L}{\partial W_2^h} &= (\hat{y} - y) \cdot \frac{\partial a_2}{\partial W_2^h}\\
+    &= (\hat{y} - y) z_1^h
+\end{align*}
+
+\noindent\textbf{Solution 3.2(c):}\\
+Applying the chain rule:
+\begin{align*}
+    \frac{\partial L}{\partial b_1^h} &= \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot \frac{\partial a_2}{\partial z_1^h} \cdot \frac{\partial z_1^h}{\partial a_1^h}
+    \cdot \frac{\partial a_1^h}{\partial b_1^h}
+\end{align*}
+Using $\frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} = \hat{y} - y$ from part (a):
+\begin{align*}
+    \frac{\partial L}{\partial b_1^h} &= (\hat{y}-y) \cdot \frac{\partial a_2}{\partial z_1^h} \cdot \frac{\partial z_1^h}{\partial a_1^h}
+    \cdot \frac{\partial a_1^h}{\partial b_1^h}\\
+    &= (\hat{y}-y) \cdot W_2^h \cdot \sigma(a_1^h)(1-\sigma(a_1^h)) \cdot 1\\
+    &= (\hat{y}-y) W_2^h \sigma(a_1^h)(1-\sigma(a_1^h))
+\end{align*}
+
+\noindent\textbf{Solution 3.2(d):}\\
+Applying the chain rule:
+\begin{align*}
+    \frac{\partial L}{\partial W_1^{h,m}} &= \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot \frac{\partial a_2}{\partial z_1^h} \cdot \frac{\partial z_1^h}{\partial a_1^h}
+    \cdot \frac{\partial a_1^h}{\partial W_1^{h,m}}
+\end{align*}
+Using $\frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a_2} \cdot \frac{\partial a_2}{\partial z_1^h} \cdot \frac{\partial z_1^h}{\partial a_1^h} = (\hat{y}-y) W_2^h \sigma(a_1^h)(1-\sigma(a_1^h)) $ from part (c):
+\begin{align*}
+    \frac{\partial L}{\partial W_1^{h,m}} &= (\hat{y}-y) W_2^h \sigma(a_1^h)(1-\sigma(a_1^h))
+    \cdot \frac{\partial a_1^h}{\partial W_1^{h,m}}\\
+    &= (\hat{y}-y) W_2^h \sigma(a_1^h)(1-\sigma(a_1^h)) x^m
+\end{align*}
 
 
 \newpage
@@ -243,51 +454,65 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
 
 
 \subsection*{Solution:}
-Plot:
-
-% \includegraphics[width=\linewidth]{final_plot}
+Plot:\\
+\includegraphics[width=\linewidth]{final_plot}
 
 Code:
 
 \begin{python}
-n_inputs = 'not implemented'
-n_hiddens = 'not implemented'
-n_outputs = 'not implemented'
+n_inputs = 28 * 28
+n_hiddens = 256
+n_outputs = 10
 
-W1 = 'not implemented'
-b1 = 'not implemented'
-W2 = 'not implemented'
-b2 = 'not implemented'
+W1 = torch.nn.Parameter(0.01 * torch.randn(size=(n_inputs, n_hiddens)))
+b1 = torch.nn.Parameter(torch.zeros(n_hiddens))
+W2 = torch.nn.Parameter(0.01 * torch.randn(size=(n_hiddens, n_outputs)))
+b2 = torch.nn.Parameter(torch.zeros(n_outputs))
 
 
 
 def relu(x):
-    'not implemented'
+    return torch.clamp(x, 0, None)
 
 
 
-def softmax(x):
-    'not implemented'
+def softmax(X):
+    numerator = torch.exp(X)
+    denominator = torch.sum(numerator, axis = 1, keepdim=True)
+    return torch.div(numerator, denominator)
 
 
 
 def net(X):
-  'not implemented'
+    flattened_X = X.flatten(start_dim=1)
+    H = relu(flattened_X @ W1 + b1)
+    O = softmax(H @ W2 + b2)
+    return O
 
 
 
 def cross_entropy(y_hat, y):
-  'not implemented'
+    loss = 0
+    loss -= torch.log(y_hat[range(len(y_hat)), y])
+    return loss
 
 
 
 def sgd(params, lr=0.1):
-  'not implemented'
+    with torch.no_grad():
+        for param in params:
+            param -= param.grad * lr
+            param.grad.zero_()
 
 
 
 def train(net, params, train_iter, loss_func=cross_entropy, updater=sgd):
-  'not implemented'
+    for _ in range(epochs):
+        for X, y in train_iter:
+            y_hat = net(X)
+            loss = loss_func(y_hat, y).mean()
+            loss.backward()
+            updater(params)
 
 \end{python}
 
@@ -297,12 +522,15 @@ def train(net, params, train_iter, loss_func=cross_entropy, updater=sgd):
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
+Ben Ray
 
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?\\
+Worked with Ty Geri, Elias Nuwara, and Angela Li\\
+CS 181 Office hours
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
-
+Approximately how long did this homework take you to complete (in hours)?\\
+15
 
 \end{document}
