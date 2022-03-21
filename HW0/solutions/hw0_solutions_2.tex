@@ -146,7 +146,7 @@
     \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
     % Document parameters
     % Document title
-    \title{CS181HW0\_v2}
+    \title{CS181 - HW0}
     
     
     
@@ -365,10 +365,6 @@
 
 \begin{document}
     
-    \maketitle
-    
-    
-
     
     CS181
 
@@ -376,20 +372,21 @@
 \subsubsection{Problem 14}\label{problem-14}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{79}{\boxspacing}
+\prompt{In}{incolor}{1}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{numpy} 
+\PY{k+kn}{import} \PY{n+nn}{numpy}\PY{n+nn}{.}\PY{n+nn}{random} 
 \PY{k+kn}{import} \PY{n+nn}{csv}
 \end{Verbatim}
 \end{tcolorbox}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{80}{\boxspacing}
+\prompt{In}{incolor}{2}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{c+c1}{\PYZsh{} 1)}
-\PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{seed}\PY{o}{=}\PY{l+m+mi}{181}
+\PY{n}{numpy}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{seed}\PY{p}{(}\PY{l+m+mi}{181}\PY{p}{)}
 \PY{n}{N}\PY{o}{=}\PY{l+m+mi}{20}
-\PY{n}{points}\PY{o}{=}\PY{p}{[}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{uniform}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{,}\PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{uniform}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{80}\PY{p}{)}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{N}\PY{p}{)}\PY{p}{]}
+\PY{n}{points}\PY{o}{=}\PY{p}{[}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{uniform}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{,}\PY{n}{numpy}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{uniform}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{80}\PY{p}{)}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{N}\PY{p}{)}\PY{p}{]}
 
 \PY{c+c1}{\PYZsh{} 2)}
 
@@ -400,7 +397,7 @@
     \PY{n}{writer} \PY{o}{=} \PY{n}{csv}\PY{o}{.}\PY{n}{writer}\PY{p}{(}\PY{n}{f}\PY{p}{)}
 
     \PY{c+c1}{\PYZsh{} write the data}
-    \PY{n}{writer}\PY{o}{.}\PY{n}{writerows}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{]}\PY{p}{)}\PY{o}{.}\PY{n}{T}\PY{p}{)}
+    \PY{n}{writer}\PY{o}{.}\PY{n}{writerows}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{]}\PY{p}{)}\PY{o}{.}\PY{n}{T}\PY{p}{)}
 
 \PY{n}{data}\PY{o}{=}\PY{p}{[}\PY{p}{]}
 \PY{k}{with} \PY{n+nb}{open}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{points.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{newline}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{as} \PY{n}{csvfile}\PY{p}{:}
@@ -416,7 +413,7 @@
 \PY{k}{def} \PY{n+nf}{f}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)}\PY{p}{:}
     \PY{k}{return} \PY{p}{(}\PY{p}{(}\PY{n}{y}\PY{o}{+}\PY{l+m+mi}{10}\PY{p}{)}\PY{o}{*}\PY{n}{x}\PY{p}{)}\PY{o}{/}\PY{l+m+mi}{5}
 \PY{n}{z}\PY{o}{=}\PY{p}{[}\PY{n}{f}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)} \PY{k}{for} \PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)} \PY{o+ow}{in} \PY{n}{points}\PY{p}{]}
-\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{The mean and std are }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s1}{ and }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s1}{ respectively.}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{z}\PY{p}{)}\PY{p}{,}\PY{n}{np}\PY{o}{.}\PY{n}{std}\PY{p}{(}\PY{n}{z}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{The mean and std are }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s1}{ and }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s1}{ respectively.}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{z}\PY{p}{)}\PY{p}{,}\PY{n}{numpy}\PY{o}{.}\PY{n}{std}\PY{p}{(}\PY{n}{z}\PY{p}{)}\PY{p}{)}\PY{p}{)}
 
 
 \PY{c+c1}{\PYZsh{} 4)}
@@ -437,19 +434,26 @@
 
     \begin{Verbatim}[commandchars=\\\{\}]
 Question 3
-The mean and std are 20.81311761705498 and 88.93356257841171 respectively.
+The mean and std are 8.03655884898792 and 78.26041781984625 respectively.
 Question 4
-The data point (x,y) with the largest y value is (-9.394760317566348,
-79.15739302186186)
+The data point (x,y) with the largest y value is (7.588312108121716,
+74.71281490761925)
 Question 5
-The sum of y-values of all points with positive x-value is 689.8063132312512
+The sum of y-values of all points with positive x-value is 514.5725256687819
     \end{Verbatim}
 
     \hypertarget{problem-15}{%
 \subsubsection{Problem 15}\label{problem-15}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{81}{\boxspacing}
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{c+c1}{\PYZsh{} 1)}
 \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Question 1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
@@ -481,7 +485,14 @@ The sum of y-values of all points with positive x-value is 689.8063132312512
 \PY{c+c1}{\PYZsh{} 6)}
 \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Question 6}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
 \PY{n}{a}\PY{p}{,}\PY{n}{b}\PY{o}{=}\PY{n}{ans\PYZus{}4}\PY{o}{.}\PY{n}{shape}
-\PY{n+nb}{print}\PY{p}{(}\PY{n}{a}\PY{o}{*}\PY{n}{b}\PY{o}{\PYZhy{}}\PY{n+nb}{sum}\PY{p}{(}\PY{n+nb}{sum}\PY{p}{(}\PY{n}{ans\PYZus{}4}\PY{o}{\PYZpc{}}\PY{k}{2})))
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Number of even elements:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{a}\PY{o}{*}\PY{n}{b}\PY{o}{\PYZhy{}}\PY{n+nb}{sum}\PY{p}{(}\PY{n+nb}{sum}\PY{p}{(}\PY{n}{ans\PYZus{}4}\PY{o}{\PYZpc{}}\PY{k}{2})))
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Solution to 6):}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n+nb}{sum}\PY{p}{(}\PY{p}{[}\PY{n+nb}{sum}\PY{p}{(}\PY{p}{[}\PY{n}{j} \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{n}{i} \PY{k}{if} \PY{n}{j}\PY{o}{\PYZpc{}}\PY{k}{2}==0]) for i in ans\PYZus{}4]))
+\PY{c+c1}{\PYZsh{} Using a loop}
+\PY{n}{count}\PY{o}{=}\PY{l+m+mi}{0}
+\PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{ans\PYZus{}4}\PY{p}{:}
+    \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{n}{i}\PY{p}{:}
+        \PY{k}{if} \PY{n}{j}\PY{o}{\PYZpc{}}\PY{k}{2}==0:
+            \PY{n}{count}\PY{o}{+}\PY{o}{=}\PY{n}{j}
 \end{Verbatim}
 \end{tcolorbox}
 
@@ -502,7 +513,8 @@ Question 4
 Question 5
 [ 1.  6. 11.]
 Question 6
-8.0
+Number of even elements: 8.0
+Solution to 6): 56.0
     \end{Verbatim}
 
 
